@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log Data</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- 네비게이션 바 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('dashboard') }}">Solar Power Monitor</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="{{ url_for('log') }}">Logs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-danger text-white" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Log Data</h1>
+    <!-- 필터링 폼 -->
+    <form method="POST" class="row g-3">
+        <div class="col-md-4">
+            <label for="date" class="form-label">Date</label>
+            <input type="date" class="form-control" id="date" name="date" required>
+        </div>
+        <div class="col-md-4">
+            <label for="data_type" class="form-label">Data Type</label>
+            <select class="form-select" id="data_type" name="data_type">
+                <option value="real_time" {% if data_type == 'real_time' %}selected{% endif %}>Real Time</option>
+                <option value="forecast" {% if data_type == 'forecast' %}selected{% endif %}>Forecast</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <button type="submit" class="btn btn-primary mt-4 w-100">Search</button>
+        </div>
+    </form>
+
+    <!-- 로그 테이블 -->
+    <div class="table-responsive mt-4">
+        {% if logs %}
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    {% if data_type == 'real_time' %}
+                    <th>#</th>
+                    <th>Timestamp</th>
+                    <th>Generation</th>
+                    <th>Charging</th>
+                    <th>Discharging</th>
+                    <th>Reactive Power</th>
+                    <th>Power Factor</th>
+                    <th>Frequency</th>
+                    <th>RS Voltage</th>
+                    <th>SS Voltage</th>
+                    <th>Load Amount</th>
+                    {% else %}
+                    <th>#</th>
+                    <th>Forecast Time</th>
+                    <th>Power Generation</th>
+                    <th>Cumulative Power</th>
+                    <th>Irradiance</th>
+                    <th>Temperature</th>
+                    <th>Wind Speed</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    {% if data_type == 'real_time' %}
+                    <td>{{ log.timestamp }}</td>
+                    <td>{{ log.generation }}</td>
+                    <td>{{ log.charging }}</td>
+                    <td>{{ log.discharging }}</td>
+                    <td>{{ log.reactive_power }}</td>
+                    <td>{{ log.power_factor }}</td>
+                    <td>{{ log.frequency }}</td>
+                    <td>{{ log.rs_voltage }}</td>
+                    <td>{{ log.ss_voltage }}</td>
+                    <td>{{ log.load_amount }}</td>
+                    {% else %}
+                    <td>{{ log.fcstDateTime }}</td>
+                    <td>{{ log.powergen }}</td>
+                    <td>{{ log.cum_powergen }}</td>
+                    <td>{{ log.irrad }}</td>
+                    <td>{{ log.temp }}</td>
+                    <td>{{ log.wind }}</td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-warning" role="alert">
+            No data available for the selected filters.
+        </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
